@@ -44,6 +44,17 @@ mail_address_hash_length: 12
 is_restrict_mail_template: true
 
 ######################################
+# キー設定 (Keys)
+######################################
+
+# A secret for generating CSRF token (You should change this if you want to run OpenPNEs on multiple servers)
+# CSRF トークンを生成するためのシークレット (複数 Web サーバで OpenPNE を動作させる場合、この設定を変更する必要があります)
+#csrf_secret: ""
+
+# A secret for generating sid token
+sid_secret: "<?php echo filemtime(__FILE__) ?>"
+
+######################################
 # セッション (Session)
 ######################################
 
@@ -109,7 +120,7 @@ ssl_required_actions:
 
   # 携帯版設定
   # for mobile_frontend
-  mobile_frontend: ["member/register", "member/registerInput", "member/registerEnd", "member/editProfile", "member/config", "member/login", "member/logout", "member/invite"]
+  mobile_frontend: ["member/register", "member/registerInput", "member/registerEnd", "member/editProfile", "member/config", "member/login", "member/logout", "member/invite", "member/configUID"]
 
   # 管理画面設定
   # for pc_backend
@@ -132,12 +143,46 @@ ssl_selectable_actions:
   pc_backend: []
 
 ######################################
+# 画像 (Images)
+######################################
+
+# ImageMagick 使用設定 (Configuration of using ImageMagick)
+#   0: off - ImageMagick を使わない (Don't use ImageMagick)
+#   1: on  - GIF のみ ImageMagick を使う (Use ImageMagick only for GIF)
+#   2: on  - JEPG,PNG,GIF に ImageMagick を使う (ただし、 GD も必要) (Use ImageMagick for JPEG,PNG,GIF)
+use_imagemagick: 0
+
+# ImageMagick コマンドのパス
+# Path to ImageMagick binary
+imagemagick_path: '/usr/bin/convert'
+#imagemagick_path: '"C:\Program Files\ImageMagick-6.2.5-Q16\convert"'
+
+# 画像生成クラス設定 (Configuration of class for image-generating)
+#   この設定を有効にすると、 use_imagemagick の設定を無視して任意のクラスで画像を生成します。
+#   (If this configuration is enabled, OpenPNE generates image by using the specified class avoid "use_imagemagick")
+#   使用されるクラス名は、 sfImageGenerator[image_generator_name] となります
+#   (OpenPNE use a class that is named as "sfImageGenerator[image_generator_name]")
+#image_generator_name: "GD"
+
+# 画像ストレージ設定 (Configuration of using storage for storing image)
+image_storage: Default  # DB に画像バイナリを保存します (Store image binaries in DB)
+#image_storage: Filesystem  # ファイルシステム上の任意のディレクトリに画像バイナリを保存します (Store image binaries to any directories in filesystem)
+
+# 画像ストレージに Filesystem を選択した場合の画像保存先ディレクトリのパス (Web サーバからの書き込み権限が必要)
+# Path to directory for storing images if a value of "image_storage" is "Filesystem" (Need to write permission from Web server)
+#image_storage_filesystem_master_dir: '/path/to/directory'
+
+######################################
 # データベース (Database)
 ######################################
 
 # テーブル名のプレフィックス (例: table_prefix: "op_")
 # Table name prefix (e.g: table_prefix: "op_")
 table_prefix: ""
+
+# Query Cache および Result Cacheのキープレフィックス (例: doctrine_cache_key_prefix: "op_")
+# Key prefix of Query Cache & Result Cache (e.g: doctrine_cache_key_prefix: "op_")
+doctrine_cache_key_prefix: ""
 
 ######################################
 # プロキシ (Proxy)

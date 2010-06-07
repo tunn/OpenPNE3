@@ -61,6 +61,27 @@ class File extends BaseFile
   {
     $this->setFilesize(strlen($this->FileBin->bin));
 
+    if ($this->isImage())
+    {
+      $class = sfImageHandler::getStorageClassName();
+      $this->setName(call_user_func(array($class, 'getFilenameToSave'), $this->getName()), $class);
+
+      $storage = call_user_func(array($class, 'create'), $this, $class);
+      $storage->saveBinary($this->getFileBin());
+    }
+
     return parent::save($conn);
+  }
+
+  public function delete(Doctrine_Connection $conn = null)
+  {
+    if ($this->isImage())
+    {
+      $class = sfImageHandler::getStorageClassName();
+      $storage = call_user_func(array($class, 'create'), $this, $class);
+      $storage->deleteBinary();
+    }
+
+    return parent::delete($conn);
   }
 }

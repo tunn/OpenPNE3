@@ -235,6 +235,22 @@ class opSecurityUser extends opAdaptableUser
       $this->setCurrentAuthMode($this->getAuthAdapter()->getAuthModeName());
       $uri = $this->getAuthAdapter()->getAuthForm()->getValue('next_uri');
 
+      // sharing session id between HTTP and HTTPS is needed
+      $request = sfContext::getInstance()->getRequest();
+      if (sfConfig::get('app_is_mobile', false)
+        && sfConfig::get('op_use_ssl', false)
+        && $request->isSecure()
+        && ($request->getMobile()->isSoftBank() || $request->getMobile()->isEZweb())
+      )
+      {
+        $item = $this->encryptSid(session_id());
+
+        $uri = '@member_setSid?next_uri='.$uri
+             .'&is_remember_login='.(int)$this->getAuthAdapter()->getAuthForm()->getValue('is_remember_me')
+             .'&sid='.$item[0]
+             .'&ts='.$item[1];
+      }
+
       return $uri;
     }
 
@@ -358,5 +374,46 @@ class opSecurityUser extends opAdaptableUser
     }
 
     return $member;
+  }
+
+  public function setSid($sid, $isRememberLogin = false)
+  {
+    if ($this->isAuthenticated())
+    {
+      return false;
+    }
+
+    session_write_close();
+
+    // set session id from request
+    session_id($sid);
+    session_start();
+    session_write_close();
+
+    if ($isRememberLogin)
+    {
+      $this->setRememberLoginCookie();
+    }
+  }
+
+  public function encryptSid($sid)
+  {
+    require_once 'Crypt/Blowfish.php';
+
+    $time  = time();
+    $bf = Crypt_Blowfish::factory('ecb',sfConfig::get('op_sid_secret').'-'.$time);
+    $data = base64_encode($bf->encrypt($sid));
+
+    return array($data, $time);
+  }
+
+  public function decryptSid($data, $time)
+  {
+    require_once 'Crypt/Blowfish.php';
+
+    $bf = Crypt_Blowfish::factory('ecb', sfConfig::get('op_sid_secret').'-'.$time);
+    $sid = $bf->decrypt(base64_decode($data));
+
+    return $sid;
   }
 }

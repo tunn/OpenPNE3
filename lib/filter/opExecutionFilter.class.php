@@ -54,11 +54,7 @@ class opExecutionFilter extends sfExecutionFilter
     $actionName = $actionInstance->getActionName();
     $request = $actionInstance->getRequest();
 
-    $currentPath = $request->getPathInfo();
-    if (!sfConfig::get('sf_no_script_name'))
-    {
-      $currentPath = $request->getScriptName().$currentPath;
-    }
+    $currentPath = $request->getCurrentUri();
 
     if (sfConfig::get('op_use_ssl', false) && $this->isFirstCall())
     {
@@ -101,6 +97,12 @@ class opExecutionFilter extends sfExecutionFilter
   {
     $moduleName = $actionInstance->getModuleName();
     $actionName = $actionInstance->getActionName();
+    $request = $actionInstance->getRequest();
+
+    if ($request->needToRedirectToSoftBankGateway())
+    {
+      $request->redirectToSoftBankGateway();
+    }
 
     $this->handleSSl($actionInstance);
 

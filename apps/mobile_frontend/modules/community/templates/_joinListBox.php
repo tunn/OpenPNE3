@@ -1,10 +1,15 @@
 <?php
 
 $list = array();
-foreach ($communities as $community)
+
+if (count($communities))
 {
-  $list[] = link_to($community->getName(), 'community/home?id='.$community->getId());
+  foreach ($communities as $community)
+  {
+    $list[] = link_to($community->getName(), 'community/home?id='.$community->getId());
+  }
 }
+
 $option = array(
   'title' => __('%Community% list with this member'),
   'border' => true,

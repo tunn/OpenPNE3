@@ -2,13 +2,13 @@
 <?php $params = array(
   'activities' => $activities,
   'gadget' => $gadget,
-  'title' => $isMine ? __('My %activity%', array(
-    '%activity%' => $op_term['activity']->titleize()->pluralize()
-  )) : __('%activity% of %0%', array(
-    '%0%' => $member->getName(),
+  'title' => __("SNS Member's %activity%", array(
     '%activity%' => $op_term['activity']->titleize()->pluralize()
   )),
-  'moreUrl' => 'member/showActivity?id='.$member->getId(),
+  'moreUrl' => 'member/showAllMemberActivity'
 ) ?>
+<?php if (isset($form)): ?>
+<?php $params['form'] = $form ?>
+<?php endif; ?>
 <?php include_partial('default/activityBox', $params) ?>
 <?php endif; ?>

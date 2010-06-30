@@ -736,6 +736,14 @@
         <target>%min_length%文字以上で入力してください。</target>
       </trans-unit>
       <trans-unit id="">
+        <source>password is too long (%max_length% characters max).</source>
+        <target>%max_length%文字以内で入力してください。</target>
+      </trans-unit>
+      <trans-unit id="">
+        <source>password is too short (%min_length% characters min).</source>
+        <target>%min_length%文字以上で入力してください。</target>
+      </trans-unit>
+      <trans-unit id="">
         <source>"%value%" does not match the time format (%time_format%).</source>
         <target>%time_format%形式で入力してください。</target>
       </trans-unit>
@@ -1248,40 +1256,40 @@
         <target>年齢の公開範囲</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Activity</source>
-        <target>アクティビティ</target>
+        <source>My %activity%</source>
+        <target>自分の%activity%</target>
       </trans-unit>
       <trans-unit id="">
-        <source>My Activities</source>
-        <target>自分のアクティビティ</target>
+        <source>%activity% of %my_friend%</source>
+        <target>%my_friend%の%activity%</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Activities of %my_friend%</source>
-        <target>%my_friend%のアクティビティ</target>
+        <source>%activity% of %0%</source>
+        <target>%0%の%activity%</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Activities of %0%</source>
-        <target>%0%のアクティビティ</target>
+        <source>There is no %activity%.</source>
+        <target>%activity%がありません。</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Post Activity</source>
-        <target>アクティビティ投稿</target>
+        <source>Do you delete this %activity%?</source>
+        <target>この%activity%を削除してもよろしいですか？</target>
       </trans-unit>
       <trans-unit id="">
-        <source>There is no activity.</source>
-        <target>アクティビティがありません。</target>
+        <source>An %activity% was deleted.</source>
+        <target>%activity%を削除しました。</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Do you delete this activity?</source>
-        <target>このアクティビティを削除してもよろしいですか？</target>
+        <source>Failed to post %activity%.</source>
+        <target>%activity%の投稿に失敗しました。</target>
       </trans-unit>
       <trans-unit id="">
-        <source>An activity was deleted.</source>
-        <target>アクティビティを削除しました。</target>
+        <source>Delete this %activity% of %time%</source>
+        <target>この%activity%を削除 (%time%)</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Failed to post activity.</source>
-        <target>アクティビティの投稿に失敗しました。</target>
+        <source>SNS Member's %activity%</source>
+        <target>SNSメンバーの%activity%</target>
       </trans-unit>
       <trans-unit id="">
         <source>Remember me</source>
@@ -1306,6 +1314,10 @@
       <trans-unit id="">
         <source>Sent a mail for your mobile e-mail address. Begin your registration from a URL in the mail.</source>
         <target>入力された携帯メールアドレス宛てにメールを送信いたしましたので、メール内に記載されたURLから携帯登録をおこなってください。</target>
+      </trans-unit>
+      <trans-unit id="">
+        <source>Search Members</source>
+        <target>メンバー検索</target>
       </trans-unit>
     </body>
   </file>

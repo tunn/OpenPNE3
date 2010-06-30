@@ -501,7 +501,7 @@ abstract class opMemberAction extends sfActions
     {
       $request->checkCSRFProtection();
       $this->activity->delete();
-      $this->getUser()->setFlash('notice', 'An activity was deleted.');
+      $this->getUser()->setFlash('notice', 'An %activity% was deleted.');
       $this->redirect('friend/showActivity');
     }
 
@@ -540,7 +540,7 @@ abstract class opMemberAction extends sfActions
         }
         else
         {
-          $this->getUser()->setFlash('error', 'Failed to post activity.');
+          $this->getUser()->setFlash('error', 'Failed to post %activity%.');
           if (isset($params['next_uri']))
           {
             $this->redirect($params['next_uri']);
@@ -550,5 +550,23 @@ abstract class opMemberAction extends sfActions
       }
     }
     return sfView::NONE;
+  }
+
+  public function executeShowAllMemberActivity(sfWebRequest $request)
+  {
+    if (!isset($this->size))
+    {
+      $this->size = 20;
+    }
+
+    $page = $request->getParameter('page', 1);
+    if ($page == 1 && opConfig::get('is_allow_post_activity'))
+    {
+      $activityData = new ActivityData();
+      $activityData->setBody($request->getParameter('body'));
+      $this->form = new ActivityDataForm($activityData);
+    }
+
+    $this->pager = Doctrine::getTable('ActivityData')->getAllMemberActivityListPager($page, $this->size);
   }
 }

@@ -1,6 +1,5 @@
-<?php op_mobile_page_title(__('%activity% of %my_friend%', array(
+<?php op_mobile_page_title(__("SNS Member's %activity%", array(
   '%activity%' => $op_term['activity']->pluralize()->titleize(),
-  '%my_friend%' => $op_term['my_friend']->pluralize()->titleize()
 ))) ?>
 <?php if ($pager->getNbResults() || isset($form)): ?>
 <?php if ($pager->getNbResults()): ?>
@@ -17,7 +16,7 @@
 <?php endif; ?>
 <?php include_partial('default/activityBox', $params) ?>
 <?php if ($pager->getNbResults()): ?>
-<?php op_include_pager_navigation($pager, 'friend/showActivity?page=%d') ?>
+<?php op_include_pager_navigation($pager, 'member/showAllMemberActivity?page=%d') ?>
 <?php endif; ?>
 <?php else: ?>
 <?php op_include_parts('box', 'ActivityBox', array(

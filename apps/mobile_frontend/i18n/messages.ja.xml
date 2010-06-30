@@ -648,6 +648,14 @@
         <target>%min_length%文字以上で入力してください。</target>
       </trans-unit>
       <trans-unit id="">
+        <source>password is too long (%max_length% characters max).</source>
+        <target>%max_length%文字以内で入力してください。</target>
+      </trans-unit>
+      <trans-unit id="">
+        <source>password is too short (%min_length% characters min).</source>
+        <target>%min_length%文字以上で入力してください。</target>
+      </trans-unit>
+      <trans-unit id="">
         <source>"%value%" does not match the time format (%time_format%).</source>
         <target>%time_format%形式で入力してください。</target>
       </trans-unit>
@@ -1152,40 +1160,36 @@
         <target>%years%年以上前</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Activity</source>
-        <target>ｱｸﾃｨﾋﾞﾃｨ</target>
+        <source>My %activity%</source>
+        <target>自分の%activity%</target>
       </trans-unit>
       <trans-unit id="">
-        <source>My Activities</source>
-        <target>自分のｱｸﾃｨﾋﾞﾃｨ</target>
+        <source>%activity% of %my_friend%</source>
+        <target>%my_friend%の%activity%</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Activities of %my_friend%</source>
-        <target>%my_friend%のｱｸﾃｨﾋﾞﾃｨ</target>
+        <source>%activity% of %0%</source>
+        <target>%0%の%activity%</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Activities of %0%</source>
-        <target>%0%のｱｸﾃｨﾋﾞﾃｨ</target>
+        <source>There is no %activity%.</source>
+        <target>%activity%がありません。</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Post Activity</source>
-        <target>投稿</target>
+        <source>Do you delete this %activity%?</source>
+        <target>この%activity%を削除してもよろしいですか？</target>
       </trans-unit>
       <trans-unit id="">
-        <source>There is no activity.</source>
-        <target>ｱｸﾃｨﾋﾞﾃｨがありません。</target>
+        <source>An %activity% was deleted.</source>
+        <target>%activity%を削除しました。</target>
       </trans-unit>
       <trans-unit id="">
-        <source>Do you delete this activity?</source>
-        <target>このｱｸﾃｨﾋﾞﾃｨを削除してもよろしいですか？</target>
+        <source>Failed to post %activity%.</source>
+        <target>%activity%の投稿に失敗しました。</target>
       </trans-unit>
       <trans-unit id="">
-        <source>An activity was deleted.</source>
-        <target>ｱｸﾃｨﾋﾞﾃｨを削除しました。</target>
-      </trans-unit>
-      <trans-unit id="">
-        <source>Failed to post activity.</source>
-        <target>ｱｸﾃｨﾋﾞﾃｨの投稿に失敗しました。</target>
+        <source>SNS Member's %activity%</source>
+        <target>SNSﾒﾝﾊﾞｰの%activity%</target>
       </trans-unit>
     </body>
   </file>

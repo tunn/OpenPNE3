@@ -22,15 +22,6 @@
 <?php end_slot(); ?>
 <?php include_slot('pager') ?>
 <?php foreach ($pager->getResults() as $community): ?>
-<?php $moreInfo = array(
-  link_to(__('Delete'), 'community/delete?id='.$community->getId()),
-  link_to(__('Make all members join in this %community%', array('%community%' => $op_term['community'])), 'community/addAllMember?id='.$community->getId())
-) ?>
-<?php if (!(bool)$community->getConfig('is_default')): ?>
-<?php $moreInfo[] = link_to(__('Add this %community% as a default', array('%community%' => $op_term['community'])), 'community/addDefaultCommunity?id='.$community->getId()) ?>
-<?php else: ?>
-<?php $moreInfo[] = link_to(__('Remove this %community% from the default', array('%community%' => $op_term['community'])), 'community/removeDefaultCommunity?id='.$community->getId()) ?>
-<?php endif; ?>
 <?php include_partial('community/communityInfo', array(
   'community' => $community, 
   'moreInfo' => array(

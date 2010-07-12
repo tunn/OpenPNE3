@@ -6,8 +6,6 @@
 <?php echo __('This is your page other member see.') ?><br>
 <?php echo __('If you edit profile, access %1%.', array('%1%' => link_to('「'. __('Edit profile') .'」', '@member_editProfile'))) ?>
 </font>
-<?php else: ?>
-<?php include_partial('member/birthdayBox', array('targetDay' => $targetDay)); ?>
 <?php endif; ?>
 
 <?php if ($mobileTopGadgets) : ?>
@@ -25,7 +23,7 @@
 </td></tr>
 
 <tr><td align="center" width="50%" valign="top">
-<?php echo image_tag_sf_image($member->getImageFileName(), array('size' => '120x120', 'format' => 'jpg')) ?>
+<?php echo op_image_tag_sf_image($member->getImageFileName(), array('size' => '120x120', 'format' => 'jpg')) ?>
 <?php if ($relation->isSelf()) : ?>
 <br><?php echo link_to(__('Edit Photo'), 'member/configImage') ?>
 <?php elseif ($member->getImageFileName()) : ?>

@@ -213,6 +213,7 @@ div#LayoutC {
 #Left,
 #Center,
 #Top {
+  zoom: 1;
   overflow: hidden;
 }
 
@@ -700,6 +701,10 @@ div.operation ul.moreInfo li {
 * html .informationBox,
 * html .informationBox div.body {
   zoom: 1;
+}
+
+* html .informationBox div.body {
+  height: 1.2em;
 }
 
 .informationBox .caution {

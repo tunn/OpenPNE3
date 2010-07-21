@@ -22,7 +22,7 @@ class opPresetProfileForm extends ProfileForm
     parent::configure();
 
     $this->validatorSchema->setPostValidator(new sfValidatorPass());
-    
+
     $this->setWidget('preset', new sfWidgetFormSelect(array('choices' => $this->getPresetChoiceList())));
     $this->setValidator('preset', new sfValidatorChoice(array('choices' => array_keys($this->getPresetChoiceList()))));
     $this->widgetSchema->setLabel('preset', 'Preset');

@@ -12,10 +12,26 @@ class MemberRelationshipTable extends opAccessControlDoctrineTable
 {
   public function retrieveByFromAndTo($memberIdFrom, $memberIdTo)
   {
-    return $this->createQuery()
+    static $queryCacheHash;
+
+    $q = $this->createQuery()
       ->where('member_id_from = ?', $memberIdFrom)
-      ->andWhere('member_id_to = ?', $memberIdTo)
-      ->fetchOne();
+      ->andWhere('member_id_to = ?', $memberIdTo);
+
+    if (!$queryCacheHash)
+    {
+      $result = $q->fetchOne();
+
+      $queryCacheHash = $q->calculateQueryCacheHash();
+    }
+    else
+    {
+      $q->setCachedQueryCacheHash($queryCacheHash);
+
+      $result = $q->fetchOne();
+    }
+
+    return $result;
   }
 
   public function retrievesByMemberIdFrom($memberId)
@@ -31,6 +47,29 @@ class MemberRelationshipTable extends opAccessControlDoctrineTable
       ->where('member_id_from = ?', $memberId)
       ->andWhere('is_access_block = ?', true)
       ->execute(array(), Doctrine::HYDRATE_ARRAY);
+  }
+
+  public function getBlockedMemberIdsByTo($memberId)
+  {
+    $result = array();
+
+    $blockedIds = $this->createQuery()
+      ->select('member_id_from')
+      ->where('member_id_to = ?', $memberId)
+      ->andWhere('is_access_block = ?', true)
+      ->execute(array(), Doctrine::HYDRATE_NONE);
+
+    $inactiveMemberIds = Doctrine::getTable('Member')->getInactiveMemberIds();
+
+    foreach ($blockedIds as $blocked)
+    {
+      if (!isset($inactiveMemberIds[$blocked[0]]))
+      {
+        $result[$blocked[0]] = $blocked[0];
+      }
+    }
+
+    return $result;
   }
 
   public function getFriendListPager($memberId, $page = 1, $size = 20)
@@ -55,13 +94,25 @@ class MemberRelationshipTable extends opAccessControlDoctrineTable
 
   public function getFriendMemberIds($memberId)
   {
+    static $queryCacheHash;
+
     $result = array();
 
-    $friendMemberIds = $this->createQuery()
-      ->select('member_id_to')
-      ->where('member_id_from = ?', $memberId)
-      ->andWhere('is_friend = ?', true)
-      ->execute(array(), Doctrine::HYDRATE_NONE);
+     $q = $this->createQuery()
+       ->select('member_id_to')
+       ->where('member_id_from = ?', $memberId)
+       ->andWhere('is_friend = ?', true);
+
+    if (!$queryCacheHash)
+    {
+      $friendMemberIds = $q->execute(array(), Doctrine::HYDRATE_NONE);
+      $queryCacheHash = $q->calculateQueryCacheHash();
+    }
+    else
+    {
+      $q->setCachedQueryCacheHash($queryCacheHash);
+      $friendMemberIds = $q->execute(array(), Doctrine::HYDRATE_NONE);
+    }
 
     $inactiveMemberIds = Doctrine::getTable('Member')->getInactiveMemberIds();
 

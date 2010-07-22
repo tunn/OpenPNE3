@@ -243,7 +243,7 @@ function op_format_date($date, $format = 'd', $culture = null, $charset = null)
           $format = 'MM/dd';
           break;
         default:
-          $format = 'd';
+          $format = 'm';
           break;
       }
       break;
@@ -254,7 +254,7 @@ function op_format_date($date, $format = 'd', $culture = null, $charset = null)
           $format = 'MM月dd日';
           break;
         default:
-          $format = 'd';
+          $format = 'm';
           break;
       }
       break;
@@ -406,13 +406,15 @@ function op_auto_link_text_for_mobile($text, $link = null, $href_options = array
   {
     return $text;
   }
-  elseif ('all' == $link)
-  {
-    $link = array('urls', 'email_addresses', 'phone_numbers');
-  }
-  elseif (!is_array($link))
+
+  if (!is_array($link))
   {
     $link = array($link);
+  }
+
+  if (in_array('all', $link))
+  {
+    $link = array('urls', 'email_addresses', 'phone_numbers');
   }
 
   if (null === $is_allow_outer_url)
@@ -421,14 +423,6 @@ function op_auto_link_text_for_mobile($text, $link = null, $href_options = array
   }
 
   $result = $text;
-  if (in_array('urls', $link))
-  {
-    $result = _op_auto_links_urls($result, $href_options, $truncate, $truncate_len, $pad);
-    if ($is_allow_outer_url)
-    {
-      $result = _op_auto_links_outer_urls($result, $href_options, $truncate, $truncate_len, $pad);
-    }
-  }
   if (in_array('email_addresses', $link))
   {
     $result = _auto_link_email_addresses($result);
@@ -436,6 +430,14 @@ function op_auto_link_text_for_mobile($text, $link = null, $href_options = array
   if (in_array('phone_numbers', $link))
   {
     $result = _op_auto_links_phone_number($result);
+  }
+  if (in_array('urls', $link))
+  {
+    $result = _op_auto_links_urls($result, $href_options, $truncate, $truncate_len, $pad);
+    if ($is_allow_outer_url)
+    {
+      $result = _op_auto_links_outer_urls($result, $href_options, $truncate, $truncate_len, $pad);
+    }
   }
 
   return $result;
@@ -446,6 +448,17 @@ function _op_auto_links_urls($text, $href_options = array(), $truncate = false, 
   $request = sfContext::getInstance()->getRequest();
   $pathArray = $request->getPathInfoArray();
   $host = explode(':', $request->getHost());
+
+  $script_name = basename($request->getScriptName());
+  if ('index.php' === $script_name)
+  {
+    $script_name = '';
+  }
+  elseif ($script_name)
+  {
+    $script_name = '/'.$script_name;
+  }
+
   if (1 == count($host))
   {
     $host[] = isset($pathArray['SERVER_PORT']) ? $pathArray['SERVER_PORT'] : '';
@@ -466,8 +479,12 @@ function _op_auto_links_urls($text, $href_options = array(), $truncate = false, 
       (?:https?:\/\/)         # protocol spec, or
     )
     (
-      '.preg_quote(implode(':', $host).($request->getRelativeUrlRoot() ? $request->getRelativeUrlRoot() : ''), '/').'
+      '.preg_quote(implode(':', $host), '/').'
     )
+    (
+      '.preg_quote($request->getRelativeUrlRoot() ? $request->getRelativeUrlRoot() : '', '/').'
+    )
+    (?:\/[^\/]+?\.php)?
     (
       [a-zA-Z0-9_\-\/.,:;\~\?@&=+$%#!()]*
     )
@@ -486,9 +503,9 @@ function _op_auto_links_urls($text, $href_options = array(), $truncate = false, 
     if ($truncate)
     {
     $callback_function .= '
-      else if (strlen($matches[4]) > '.$truncate_len.')
+      else if (strlen($matches[5]) > '.$truncate_len.')
       {
-        return $matches[1].\'<a href="\'.$matches[4].\'"'.$href_options.'>\'.substr($matches[4], 0, '.$truncate_len.').\''.$pad.'</a>\'.$matches[5];
+        return $matches[1].\'<a href="\'.$matches[4].\''.$script_name.'\'.$matches[5].\'"'.$href_options.'>\'.substr($matches[5], 0, '.$truncate_len.').\''.$pad.'</a>\'.$matches[6];
       }
       ';
     }
@@ -496,7 +513,7 @@ function _op_auto_links_urls($text, $href_options = array(), $truncate = false, 
     $callback_function .= '
       else
       {
-        return $matches[1].\'<a href="\'.$matches[4].\'"'.$href_options.'>\'.$matches[4].\'</a>\'.$matches[5];
+        return $matches[1].\'<a href="\'.$matches[4].\''.$script_name.'\'.$matches[5].\'"'.$href_options.'>\'.$matches[5].\'</a>\'.$matches[6];
       }
       ';
 
@@ -546,32 +563,7 @@ function _op_auto_links_outer_urls($text, $href_options = array(), $truncate = f
 
 function _op_auto_links_phone_number($text)
 {
-  $pattern = '/
-    (
-      <\w+.*?>|             #   leading HTML tag, or
-      [^=!:\'"\/]|          #   leading punctuation, or
-      ^                     #   beginning of line
-    )
-    (0\d{1,3})-?(\d{2,4})-?(\d{4})
-    ([[:punct:]]|\s|<|$)      # trailing text
-    /x';
-
-  $callback_function = '
-    if (preg_match("/<a\s/i", $matches[1]))
-    {
-      return $matches[0];
-    }
-    else
-    {
-      return $matches[1].\'<a href="tel:\'.$matches[2].$matches[3].$matches[4].\'">\'.$matches[0].\'</a>\'.$matches[5];
-    }
-    ';
-
-  return preg_replace_callback(
-    $pattern,
-    create_function('$matches', $callback_function),
-    $text
-    );
+  return preg_replace('/\b((0\d{1,3})-?(\d{2,4})-?(\d{4}))\b/', '<a href="tel:\\2\\3\\4">\\1</a>', $text);
 }
 
 /**
@@ -1112,7 +1104,7 @@ function op_image_tag($source, $options = array())
  */
 function op_image_path($source, $absolute = false)
 {
-  static $skinPluginDir = null;
+  static $skinPlugin = null;
 
   if (strpos($source, '://'))
   {
@@ -1121,32 +1113,32 @@ function op_image_path($source, $absolute = false)
 
   if (0 !== strpos($source, '/'))
   {
-    if (null === $skinPluginDir)
+    if (null === $skinPlugin)
     {
-      $plugins = sfContext::getInstance()->getConfiguration()->getPluginPaths();
+      $plugins = sfContext::getInstance()->getConfiguration()->getPlugins();
       foreach ($plugins as $plugin)
       {
-        if (preg_match('/^'.preg_quote(sfConfig::get('sf_plugins_dir'), '/').'(\/opSkin.*Plugin)/', $plugin, $matches))
+        if (0 === strpos($plugin, 'opSkin'))
         {
-          $skinPluginDir = $matches;
+          $skinPlugin = $plugin;
           break;
         }
-        $skinPluginDir = false;
+
+        $skinPlugin = false;
       }
     }
 
-    if ($skinPluginDir)
+    if ($skinPlugin)
     {
-      $pattern = $skinPluginDir[0].'/web/images/'.$source;
-      $path = explode('/', $source);
-      if (strpos('.', $path[count($path) - 1]))
+      $file = sfConfig::get('sf_web_dir').'/'.$skinPlugin.'/images/'.$source;
+      if (false === strpos(basename($source), '.'))
       {
-        $pattern .= $pattern.'.png';
+        $file .= '.png';
       }
 
-      if (glob($pattern))
+      if (file_exists($file))
       {
-        $source = $skinPluginDir[1].'/images/'.$source;
+        $source = '/'.$skinPlugin.'/images/'.$source;
       }
     }
   }

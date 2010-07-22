@@ -19,6 +19,10 @@ abstract class opApplicationConfiguration extends sfApplicationConfiguration
 {
   static protected $zendLoaded = false;
 
+  protected
+   $globEnablePluginList = array(),
+   $globEnablePluginControllerList = array();
+
   protected $appRoutings = array();
 
   public function initialize()
@@ -33,6 +37,8 @@ abstract class opApplicationConfiguration extends sfApplicationConfiguration
 
     $this->dispatcher->connect('op_confirmation.list', array(__CLASS__, 'getCoreConfirmList'));
     $this->dispatcher->connect('op_confirmation.decision', array(__CLASS__, 'processCoreConfirm'));
+
+    $this->dispatcher->connect('op_activity.template.filter_body', array('ActivityDataTable', 'filterBody'));
 
     $this->setConfigHandlers();
   }
@@ -409,7 +415,44 @@ abstract class opApplicationConfiguration extends sfApplicationConfiguration
 
   public function globEnablePlugin($pattern, $isControllerPath = false)
   {
-    return $this->globPlugins($pattern, false, $isControllerPath);
+    if ($this->isDebug())
+    {
+      return $this->globPlugins($pattern, false, $isControllerPath);
+    }
+
+    $cacheKey = md5(serialize($pattern));
+    $cacheHead = substr($cacheKey, 0, 2);
+
+    $cacheDir = sfConfig::get('sf_cache_dir').DIRECTORY_SEPARATOR;
+
+    $cacheFile = $cacheDir.'glob_enable_plugin_path'.DIRECTORY_SEPARATOR.$cacheHead.'.php';
+    $cacheProperty = 'globEnablePluginList';
+    if ($isControllerPath)
+    {
+      $cacheFile = $cacheDir.'glob_enable_plugin_path_controller'.DIRECTORY_SEPARATOR.$cacheHead.'.php';
+      $cacheProperty = 'globEnablePluginControllerList';
+    }
+
+    $_prop =& $this->$cacheProperty;
+
+    if (empty($_prop[$cacheHead]))
+    {
+      if (is_readable($cacheFile))
+      {
+        $_prop[$cacheHead] = include $cacheFile;
+      }
+    }
+
+    if (isset($_prop[$cacheHead][$cacheKey]))
+    {
+      return $_prop[$cacheHead][$cacheKey];
+    }
+
+    $_prop[$cacheHead][$cacheKey] = $this->globPlugins($pattern, false, $isControllerPath);
+
+    opToolkit::writeCacheFile($cacheFile, "<?php\nreturn ".var_export($_prop[$cacheHead], true).';');
+
+    return $_prop[$cacheHead][$cacheKey];
   }
 
   public function getGlobalTemplateDir($templateFile)
@@ -502,7 +545,25 @@ abstract class opApplicationConfiguration extends sfApplicationConfiguration
     $filesystem = new sfFilesystem();
     $filesystem->mkdirs(sfConfig::get('sf_cache_dir'));
 
+    if ('\\' === DIRECTORY_SEPARATOR)  // Windows
+    {
+      $permission = substr(sprintf('%o', fileperms($newCacheDir)), -4);
+      if ('0777' !== $permission)
+      {
+        register_shutdown_function(array($this, 'removeCacheDir'));
+      }
+    }
+
     parent::setCacheDir($newCacheDir);
+  }
+
+  public function removeCacheDir()
+  {
+    $dir = sfConfig::get('sf_cache_dir');
+
+    $filesystem = new sfFilesystem();
+    $filesystem->remove(sfFinder::type('any')->in($dir));
+    $filesystem->remove($dir);
   }
 
   public function generateAppUrl($application, $parameters = array(), $absolute = false)

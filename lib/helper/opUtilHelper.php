@@ -269,7 +269,7 @@ function op_format_date($date, $format = 'd', $culture = null, $charset = null)
           $format = 'MM/dd';
           break;
         default:
-          $format = 'd';
+          $format = 'm';
           break;
       }
       break;
@@ -280,7 +280,7 @@ function op_format_date($date, $format = 'd', $culture = null, $charset = null)
           $format = 'MM月dd日';
           break;
         default:
-          $format = 'd';
+          $format = 'm';
           break;
       }
       break;
@@ -650,7 +650,7 @@ function op_have_privilege_by_uri($uri, $params = array(), $member_id = null)
   return true;
 }
 
-function op_decoration($string, $is_strip = false, $is_use_stylesheet = null)
+function op_decoration($string, $is_strip = false, $is_use_stylesheet = null, $isOpTagFollowup = true)
 {
   if (is_null($is_use_stylesheet))
   {
@@ -661,7 +661,7 @@ function op_decoration($string, $is_strip = false, $is_use_stylesheet = null)
     }
   }
 
-  return opWidgetFormRichTextareaOpenPNE::toHtml($string, $is_strip, $is_use_stylesheet);
+  return opWidgetFormRichTextareaOpenPNE::toHtml($string, $is_strip, $is_use_stylesheet, $isOpTagFollowup);
 }
 
 function op_is_accessable_url($uri)

@@ -13,3 +13,6 @@ changeLanguage:
 
 registerMobileToRegisterEnd:
   credentials: SNSRegisterFinish
+
+registerMobileToRegisterEndFinish:
+  credentials: SNSRegisterFinish

@@ -181,15 +181,36 @@ class opFormItemGenerator
       return $obj;
     }
 
-    if ($field['ValueType'] === 'integer' || $field['FormType'] === 'date')
+    if ($field['ValueType'] === 'integer')
     {
-      if (!empty($field['ValueMin']))
+      if (isset($field['ValueMin']) && is_numeric($field['ValueMin']))
       {
         $option['min'] = $field['ValueMin'];
       }
-      if (!empty($field['ValueMax']))
+      if (isset($field['ValueMax']) && is_numeric($field['ValueMax']))
       {
         $option['max'] = $field['ValueMax'];
+        if (isset($option['min']) && (int)$option['min'] > (int)$option['max'])
+        {
+          unset($option['min']);
+          unset($option['max']);
+        }
+      }
+    }
+    elseif ($field['FormType'] === 'date')
+    {
+      if (isset($field['ValueMin']) && false !== strtotime($field['ValueMin']))
+      {
+        $option['min'] = $field['ValueMin'];
+      }
+      if (isset($field['ValueMax']) && false !== strtotime($field['ValueMax']))
+      {
+        $option['max'] = $field['ValueMax'];
+        if (isset($option['min']) && strtotime($option['min']) > strtotime($option['max']))
+        {
+          unset($option['min']);
+          unset($option['max']);
+        }
       }
     }
     else
@@ -266,6 +287,9 @@ class opFormItemGenerator
       // doesn't allow searching
       case 'increased_input':
       case 'language_select':
+      case 'password':
+        $obj = null;
+        break;
       // country
       case 'country_select':
         $info = sfCultureInfo::getInstance(sfContext::getInstance()->getUser()->getCulture());
@@ -294,9 +318,6 @@ class opFormItemGenerator
         $list = opToolkit::arrayMapRecursive(array(sfContext::getInstance()->getI18N(), '__'), $list);
         $params['choices'] = array('' => '')+ $list;
         $obj = new sfWidgetFormChoice($params);
-        break;
-      case 'password':
-        $obj = null;
         break;
       // date
       case 'date':
@@ -342,14 +363,11 @@ class opFormItemGenerator
       // doesn't allow searching
       case 'increased_input':
       case 'language_select':
-      case 'country_select':
-        $q->andWhere($column.' = ?', $value);
+      case 'password':
         break;
+      case 'country_select':
       case 'region_select':
         $q->andWhere($column.' = ?', $value);
-        break;
-      case 'password':
-        // pass
         break;
       // text and something else
       default:

@@ -249,13 +249,6 @@ class designActions extends sfActions
         $this->form->save();
         $this->redirect('design/banner');
       }
-      if (!isset($params['file']))
-      {
-        $banner->setName($params['name']);
-        $banner->setUrl($params['url']);
-        $banner->save();
-        $this->redirect('design/banner');
-      }
     }
   }
 
@@ -274,6 +267,7 @@ class designActions extends sfActions
 
     if ($request->isMethod(sfWebRequest::POST))
     {
+      $request->checkCSRFProtection();
       $banner->delete();
       $this->redirect('design/banner');
     }

@@ -36,6 +36,8 @@ class navigationActions extends sfActions
   public function executeList(sfWebRequest $request)
   {
     $this->list = array();
+    $this->deleteForm = new BaseForm();
+    $this->sortForm = new BaseForm();
 
     $types = Doctrine::getTable('Navigation')->getTypesByAppName($request->getParameter('app', 'pc'));
 
@@ -95,6 +97,8 @@ class navigationActions extends sfActions
 
     if ($request->isMethod(sfWebRequest::POST))
     {
+      $request->checkCSRFProtection();
+
       $model = Doctrine::getTable('Navigation')->find($request->getParameter('id'));
       $this->forward404Unless($model);
       $types = Doctrine::getTable('Navigation')->getTypesByAppName($app);
@@ -122,6 +126,8 @@ class navigationActions extends sfActions
     {
       $this->forward404();
     }
+
+    $request->checkCSRFProtection();
 
     $parameters = $request->getParameterHolder();
     $keys = $parameters->getNames();

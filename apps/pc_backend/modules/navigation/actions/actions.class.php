@@ -36,6 +36,8 @@ class navigationActions extends sfActions
   public function executeList(sfWebRequest $request)
   {
     $this->list = array();
+    $this->deleteForm = new BaseForm();
+    $this->sortForm = new BaseForm();
 
     $types = Doctrine::getTable('Navigation')->getTypesByAppName($request->getParameter('app', 'pc'));
 
@@ -49,34 +51,6 @@ class navigationActions extends sfActions
       $nav = new Navigation();
       $nav->setType($type);
       $this->list[$type][] = new NavigationForm($nav);
-    }
-
-    if ($request->isMethod(sfWebRequest::POST))
-    {
-      $params = $request->getParameter('nav');
-      $this->forward404Unless(isset($params['type']));
-      $type = $params['type'];
-      $this->forward404Unless(isset($this->list[$type]));
-      $count = count($this->list[$type]);
-      if (!isset($params['id']))
-      {
-        $params['id'] = 0;
-      }
-      if ($params['id'])
-      {
-        for ($i = 0; $i < $count - 1; $i++)
-        {
-          if ($params['id'] === $this->list[$type][$i]->getObject()->id)
-          {
-            $this->list[$type][$i]->bind($params);
-            break;
-          }
-        }
-      }
-      else
-      {
-        $this->list[$type][$count - 1]->bind($params);
-      }
     }
   }
 
@@ -101,17 +75,15 @@ class navigationActions extends sfActions
         $types = Doctrine::getTable('Navigation')->getTypesByAppName($app);
         $this->forward404Unless(in_array($nav['type'], $types));
         $this->form->save();
+      }
 
-        if ('pc' === $app)
-        {
-          $this->removeNavCaches();
-        }
-
-        $this->redirect('navigation/list?app='.$app);
+      if ('pc' === $app)
+      {
+        $this->removeNavCaches();
       }
     }
 
-    $this->forward('navigation', 'list');
+    $this->redirect('navigation/list?app='.$app);
   }
 
  /**
@@ -125,6 +97,8 @@ class navigationActions extends sfActions
 
     if ($request->isMethod(sfWebRequest::POST))
     {
+      $request->checkCSRFProtection();
+
       $model = Doctrine::getTable('Navigation')->find($request->getParameter('id'));
       $this->forward404Unless($model);
       $types = Doctrine::getTable('Navigation')->getTypesByAppName($app);
@@ -152,6 +126,8 @@ class navigationActions extends sfActions
     {
       $this->forward404();
     }
+
+    $request->checkCSRFProtection();
 
     $parameters = $request->getParameterHolder();
     $keys = $parameters->getNames();

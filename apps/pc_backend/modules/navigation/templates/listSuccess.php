@@ -24,14 +24,9 @@
 <form action="<?php echo url_for('navigation/edit?app='.$sf_request->getParameter('app', 'pc')) ?>" method="post">
 <td>
 <?php echo $form->renderHiddenFields() ?>
-<?php echo $form['uri']->renderError() ?>
-<?php echo $form['uri']->render() ?>
-</td>
+<?php echo $form['uri']->render() ?></td>
 <?php foreach ($languages as $language): ?>
-<td>
-<?php echo $form[$language]['caption']->renderError() ?>
-<?php echo $form[$language]['caption']->render() ?>
-</td>
+<td><?php echo $form[$language]['caption']->render() ?></td>
 <?php endforeach; ?>
 <?php if ($form->isNew()) : ?>
 <td colspan="2"><input type="submit" value="<?php echo __('Add') ?>" /></td>
@@ -39,7 +34,12 @@
 <?php else : ?>
 <td><input type="submit" value="<?php echo __('Edit') ?>" /></td>
 </form>
-<td><form action="<?php echo url_for('navigation/delete?app='.$sf_request->getParameter('app', 'pc').'&id='.$form->getObject()->getId()) ?>" method="post" /><input type="submit" value="<?php echo __('Delete') ?>" /></form></td>
+<td>
+<form action="<?php echo url_for('navigation/delete?app='.$sf_request->getParameter('app', 'pc').'&id='.$form->getObject()->getId()) ?>" method="post">
+<?php echo $deleteForm ?>
+<input type="submit" value="<?php echo __('Delete') ?>" />
+</form>
+</td>
 <?php endif; ?>
 </tr>
 </tbody>
@@ -49,7 +49,8 @@
 <?php echo sortable_element('type_'.str_replace(' ', '_', $type), array(
   'tag'  => 'tbody',
   'only' => 'sortable',
-  'url'  => 'navigation/sort'
+  'url'  => 'navigation/sort',
+  'with' => 'Sortable.serialize("type_'.str_replace(' ', '_', $type).'")+"&'.urlencode($sortForm->getCSRFFieldName()).'='.urlencode($sortForm->getCSRFToken()).'"',
 )) ?>
 
 <?php endforeach; ?>

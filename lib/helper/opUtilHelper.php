@@ -1029,8 +1029,7 @@ function op_replace_sns_term($string)
 function op_link_to_member($value, $options = array(), $routeName = '@obj_member_profile')
 {
   $member = null;
-  $value = $value instanceof sfOutputEscaper ? $value->getRawValue() : $value;
-  if ($value instanceof Member)
+  if ($value instanceof sfOutputEscaper || $value instanceof Member)
   {
     $member = $value;
   }
@@ -1041,6 +1040,11 @@ function op_link_to_member($value, $options = array(), $routeName = '@obj_member
 
   if ($member && $member->id)
   {
+    if (!($member instanceof sfOutputEscaper))
+    {
+      $member = sfOutputEscaper::escape(sfConfig::get('sf_escaping_method'), $member);
+    }
+
     $link_target = $member->name;
     if (isset($options['link_target']))
     {
@@ -1051,7 +1055,10 @@ function op_link_to_member($value, $options = array(), $routeName = '@obj_member
     return link_to($link_target, sprintf('%s?id=%d', $routeName, $member->id), $options);
   }
 
-  return Doctrine::getTable('SnsConfig')->get('nickname_of_member_who_does_not_have_credentials', '-');
+  return sfOutputEscaper::escape(
+    sfConfig::get('sf_escaping_method'),
+    opConfig::get('nickname_of_member_who_does_not_have_credentials', '-')
+  );
 }
 
 /**
